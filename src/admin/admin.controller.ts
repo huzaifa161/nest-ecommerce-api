@@ -1,8 +1,11 @@
 import { Controller, Get, Post, Body, Param, Patch } from "@nestjs/common";
-
+import { AdminService } from './admin.service';
 @Controller('api/admin')
 export class AdminController{
 
+    constructor(private adminService: AdminService){
+
+    }
 
     //ADD NEW PRODUCT
     @Post('/add-new-product')
@@ -21,21 +24,27 @@ export class AdminController{
     //GET PRODUCTS
     @Get('products')
     getProducts(){
-        return ['product 1','product 2']
+        return this.adminService.getProducts();
     }
 
 
     //GET CATEGORIES
     @Get('categories')
     getCategories(){
-        return ['category 1','category 2']
+        return this.adminService.getCategories();
     }
 
 
     //GET ORDERS
     @Get('orders')
     getOrders(){
-        return ['order 1','order 2']
+        return this.adminService.getOrders();
+    }
+
+    //GET CUSTOMERS
+    @Get('customers')
+    getCustomers(){
+        return this.adminService.getCustomers();
     }
 
 

@@ -16,16 +16,16 @@ export class Customer {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ nullable: true})
   address: string;
 
-  @Column()
+  @Column({ nullable: true})
   tokenExpires: string;
 
-  @Column()
+  @Column({ nullable: true})
   resetToken: string;
 
-  @Column({ default: true })
+  @Column({ nullable: true})
   verified: boolean;
 
   @OneToMany(() => Order, order => order.customer)

@@ -8,15 +8,15 @@ export class ProductToCart {
     public productToCartId!: number;
 
     @Column()
-    public productId!: number;
+    public productId: number;
 
     @Column()
-    public cartId!: number;
+    public cartId: number;
 
-    @Column()
+    @Column({ nullable: true})
     total:number;
 
-    @Column()
+    @Column({ nullable: true})
     quantity:number;
 
     @ManyToOne(() => Product, product => product.productToCart)

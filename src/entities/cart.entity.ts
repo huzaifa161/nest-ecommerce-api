@@ -8,10 +8,10 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable:true})
   total: number;
 
-  @Column()
+  @Column({ nullable: true})
   quantity: string;
 
   @OneToMany(() => ProductToCart, productToCart => productToCart.cart)

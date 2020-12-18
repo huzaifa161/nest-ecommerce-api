@@ -12,10 +12,10 @@ export class Product {
   @Column()
   productName: string;
 
-  @Column()
+  @Column({ nullable: true})
   productDesc: string;
 
-  @Column()
+  @Column({ nullable: true})
   quantity: number;
 
   @Column()
@@ -24,10 +24,10 @@ export class Product {
   @Column()
   image_1:string;
 
-  @Column()
+  @Column({ nullable: true})
   image_2:string;
 
-  @Column()
+  @Column({ nullable: true})
   image_3:string;
   
   @ManyToOne(() => Admin, admin => admin.products)

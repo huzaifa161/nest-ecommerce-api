@@ -15,7 +15,7 @@ export class Category {
   @Column()
   image: string;
 
-  @Column()
+  @Column({ nullable: true})
   category_parent_id: number;
   
   @OneToMany(() => Product, product => product.category)

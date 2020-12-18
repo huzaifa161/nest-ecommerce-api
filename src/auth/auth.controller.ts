@@ -1,11 +1,17 @@
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 import { CreateUserDto } from './dto';
+
+import { AuthService } from './auth.service';
 @Controller('api/auth')
 export class AuthController{
  
+
+    constructor(private authService:AuthService){
+
+    }
     @Post('sign-up-user')
     createNewUser(@Body() createUserDto:CreateUserDto){
-        return createUserDto;
+        return this.authService.signUpUser(createUserDto.name, createUserDto.email, createUserDto.password)
 
     }
 

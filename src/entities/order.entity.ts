@@ -14,14 +14,11 @@ export class Order {
   @Column()
   order_status: string;
 
-  @Column()
+  @Column({ nullable: true})
   total_amount: number;
 
-  @Column()
+  @Column({ nullable: true})
   product_count: number;
-
-  @Column()
-  category_parent_id: number;
 
   @ManyToOne(() => Customer, customer => customer.orders)
   customer:Customer;
