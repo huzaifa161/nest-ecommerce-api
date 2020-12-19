@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Param, Patch } from "@nestjs/common";
+import { ProductDto } from "src/product/product.dto";
 import { AdminService } from './admin.service';
 @Controller('api/admin')
 export class AdminController{
@@ -9,42 +10,42 @@ export class AdminController{
 
     //ADD NEW PRODUCT
     @Post('/add-new-product')
-    createProduct(@Body() productData, @Body() catId:string){
-
+    async createProduct(@Body() productData: ProductDto){
+        return await this.adminService.createNewProduct(productData);
     }
 
 
     //ADD NEW CATEGORY
     @Post('/add-new-category')
     createCategory(@Body() categoryData){
-
+        return this.adminService.createNewCategory(categoryData);
     }
 
 
     //GET PRODUCTS
     @Get('products')
     getProducts(){
-        return this.adminService.getProducts();
+        return this.adminService.findAllProducts();
     }
 
 
-    //GET CATEGORIES
+    // GET CATEGORIES
     @Get('categories')
     getCategories(){
-        return this.adminService.getCategories();
+        return this.adminService.findAllCategories();
     }
 
 
     //GET ORDERS
     @Get('orders')
     getOrders(){
-        return this.adminService.getOrders();
+        return this.adminService.findAllOrders();
     }
 
     //GET CUSTOMERS
     @Get('customers')
     getCustomers(){
-        return this.adminService.getCustomers();
+        return this.adminService.findAllCustomers();
     }
 
 

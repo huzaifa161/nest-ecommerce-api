@@ -13,6 +13,8 @@ export class ProductToCart {
     @Column()
     public cartId: number;
 
+    @Column()
+    price:number;
     @Column({ nullable: true})
     total:number;
 

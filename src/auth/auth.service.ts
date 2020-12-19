@@ -7,7 +7,6 @@ export class AuthService{
 
 
     async signUpUser(name:string, email:string, password:string){
-
         const savedUser =  await getConnection()
             .createQueryBuilder()
             .insert()
