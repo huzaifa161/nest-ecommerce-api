@@ -1,10 +1,14 @@
 import { Injectable } from "@nestjs/common";
-import { getConnection, Repository } from 'typeorm';
+import {  Repository } from 'typeorm';
 import { Customer } from '../entities/customer.entity';
 import { Order } from '../entities/order.entity';
 import { Product } from '../entities/product.entity';
+import { Admin } from '../entities/admin.entity';
 import { Category } from '../entities/category.entity';
 import { InjectRepository } from "@nestjs/typeorm";
+import * as bcrypt from 'bcrypt';
+import { AuthService } from "src/auth/auth.service";
+
 @Injectable()
 export class AdminService{
 
@@ -13,41 +17,33 @@ export class AdminService{
         @InjectRepository(Product) private productRespository:Repository<Product>,
         @InjectRepository(Order) private orderRespository:Repository<Order>,
         @InjectRepository(Category) private categoryRespository:Repository<Category>,
+        @InjectRepository(Admin) private adminRepository:Repository<Admin>,
+        private authService:AuthService
     ){
 
     }
 
-    // async getCustomers(){
-    //     return await getConnection()
-    //         .createQueryBuilder()
-    //         .select("customer")
-    //         .from(Customer, "customer")
-    //         .getMany()
-    // }
+    findAdmin(){
+        
+    }
 
-    // async getOrders(){
-    //     return await getConnection()
-    //         .createQueryBuilder()
-    //         .select('order')
-    //         .from(Order,'order')
-    //         .getMany();
-    // }
+    async loginAdmin(email:string, password:string){
+        const admin = await this.adminRepository.findOne({ email});
+        if(admin && bcrypt.compare(password,admin.password)){
+            return this.authService.login(admin);
+        }
+        return null;
+    }
 
-    // async getProducts(){
-    //     return await getConnection()
-    //         .createQueryBuilder()
-    //         .select('product')
-    //         .from(Product,'product')
-    //         .getMany();
-    // }
+    async createAdmin(name, email, password){
 
-    // async getCategories(){
-    //     return await getConnection()
-    //         .createQueryBuilder()
-    //         .select('category')
-    //         .from(Category,'category')
-    //         .getMany();
-    // }
+        const adminInstance = this.adminRepository.create({name,email,password:await this.getHashedPassword(password)});
+        return this.adminRepository.save(adminInstance)
+    }
+
+    async getHashedPassword(password:string){
+        return await bcrypt.hash(password,10);
+    }
 
     createNewCategory(categoryData){
         const category =  this.categoryRespository.create(categoryData);

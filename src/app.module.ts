@@ -9,6 +9,7 @@ import { CategoryModule } from './category/category.module';
 import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -26,7 +27,7 @@ import { CartModule } from './cart/cart.module';
   OrderModule,
   AuthModule,
   CartModule,
-  AuthModule],
+  AuthModule,MailModule],
   controllers: [AppController],
   providers: [AppService],
 })

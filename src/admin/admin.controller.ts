@@ -8,6 +8,18 @@ export class AdminController{
 
     }
 
+
+    // @Post('/create-admin')
+    // async createAdmin(@Body() loginData){
+    //     return await this.adminService.createAdmin(loginData.name,loginData.email, loginData.password);
+    // }
+
+
+    @Post('/login')
+     login(@Body() loginData){
+        return this.adminService.loginAdmin(loginData.email, loginData.password);
+    }
+
     //ADD NEW PRODUCT
     @Post('/add-new-product')
     async createProduct(@Body() productData: ProductDto){
