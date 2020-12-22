@@ -1,14 +1,11 @@
-import { Injectable, NotFoundException, UseInterceptors } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { CustomerService } from "src/customer/customer.service";
 import { MailService } from "src/mail/mail.service";
-import {getConnection} from "typeorm";
-import { Customer } from '../entities/customer.entity'; 
 @Injectable()
 export class AuthService{
-
     constructor(
         private customerService:CustomerService,
         private jwtService:JwtService,
@@ -21,6 +18,12 @@ export class AuthService{
         }
         const savedUser = await this.customerService.createNewCustomer({ name,email,password:await this.getHashedPassword(password)});  
         const token = crypto.randomBytes(20).toString('hex');
+
+        const tokenExpires = (Date.now() * 3600000000).toString();
+
+        savedUser.resetToken = token;
+        savedUser.tokenExpires = tokenExpires;
+        await this.customerService.save(savedUser);
 
         const link = "http://" + host + "/api/auth/confirm-email/" + token;
 
@@ -35,9 +38,22 @@ export class AuthService{
         return { message:"Account created Please verify your account"}
     }
 
+    async confirmEmail (token){
+        const customer = await this.findUserByToken(token);
+
+        customer.resetToken = null;
+        customer.tokenExpires = null;
+        customer.verified = true;
+
+        await this.customerService.save(customer)
+        return { message:'Account Verified'}
+    }
+
+
     async createForgetPasswordToken(email, host){
+        if(!email) return { error:'Email is required'};
         const customer = await this.customerService.findOne(email);
-        if(!customer) throw new NotFoundException('customer with that email does not exists');
+        if(!customer || !customer.verified) throw new NotFoundException('customer with that email does not exists or not verified');
 
         const token = crypto.randomBytes(20).toString('hex');
 
@@ -60,20 +76,9 @@ export class AuthService{
 
     }
 
-    async confirmEmail (token){
-        const customer = await this.findUserByToken(token);
-
-        customer.resetToken = null;
-        customer.tokenExpires = null;
-        customer.verified = true;
-
-        await this.customerService.save(customer)
-        return { message:'Account Verified'}
-    }
     
     async findUserByToken(token){
         const userExists = await this.customerService.findToken(token);
-        console.log(userExists)
         if(!userExists) throw new NotFoundException('Invalid token');
 
         const tokenExpires = Number(userExists.tokenExpires);
@@ -88,8 +93,9 @@ export class AuthService{
     }
 
     async resetPassword(token,password,confirmPassword){
+        if(!password) return { error:'Password is required'};
         const user = await this.findUserByToken(token);
-        user.password = password;
+        user.password = await this.getHashedPassword(password);
         user.resetToken = null;
         user.tokenExpires = null;
 
@@ -105,7 +111,7 @@ export class AuthService{
 
     async validateCustomer(email: string, password:string){
         const user = await this.customerService.findOne(email);
-        if(user && bcrypt.compare(password, user.password) && user.verified){
+        if(user && await bcrypt.compare(password, user.password) && user.verified){
             const { password, ...result} = user;
             return result;
         }

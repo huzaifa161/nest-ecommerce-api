@@ -29,7 +29,7 @@ export class AdminService{
 
     async loginAdmin(email:string, password:string){
         const admin = await this.adminRepository.findOne({ email});
-        if(admin && bcrypt.compare(password,admin.password)){
+        if(admin && await bcrypt.compare(password,admin.password)){
             return this.authService.login(admin);
         }
         return null;

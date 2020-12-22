@@ -7,6 +7,6 @@ export class ProductDto{
     image_2:string;
     image_3:string;
     category_parent_id:number;
-    adminId:number;
+    admin:number;
     catId:number;
 }

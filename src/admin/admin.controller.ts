@@ -1,6 +1,11 @@
-import { Controller, Get, Post, Body, Param, Patch } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Patch, UseInterceptors, UploadedFile, UploadedFiles, Request } from "@nestjs/common";
+import { FileFieldsInterceptor, FileInterceptor } from "@nestjs/platform-express";
 import { ProductDto } from "src/product/product.dto";
 import { AdminService } from './admin.service';
+import * as path from 'path';
+
+import { diskStorage } from 'multer';
+
 @Controller('api/admin')
 export class AdminController{
 
@@ -22,21 +27,49 @@ export class AdminController{
 
     //ADD NEW PRODUCT
     @Post('/add-new-product')
-    async createProduct(@Body() productData: ProductDto){
+    @UseInterceptors(FileFieldsInterceptor([
+        { name: 'image_1', maxCount: 1 },
+        { name: 'image_2', maxCount: 1 },
+        { name: 'image_3', maxCount: 1 },
+    ], {
+        storage: diskStorage({
+          destination: './uploads'
+          , filename: (req, file, cb) => {
+            const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+            cb(null, `${randomName}${path.extname(file.originalname)}`)
+          }
+        })
+      }))
+    async createProduct(@Body() productData: ProductDto, @UploadedFiles() files,@Request() req){
+        productData.admin = req.user.sub;
+        if(files.image_1) productData.image_1 = files.image_1[0].path;
+        if(files.image_2) productData.image_2 = files.image_2[0].path;
+        if(files.image_3) productData.image_3 = files.image_3[0].path;
         return await this.adminService.createNewProduct(productData);
     }
 
 
     //ADD NEW CATEGORY
     @Post('/add-new-category')
-    createCategory(@Body() categoryData){
+    @UseInterceptors(FileInterceptor('image',{
+        storage:diskStorage({
+            destination: './uploads/category'
+            , filename: (req, file, cb) => {
+              const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
+              cb(null, `${randomName}${path.extname(file.originalname)}`)
+            }
+          })
+    }))
+    async createCategory(@Body() categoryData,@UploadedFile() file){
+        categoryData.image = file.path;
         return this.adminService.createNewCategory(categoryData);
     }
 
 
     //GET PRODUCTS
     @Get('products')
-    getProducts(){
+    getProducts(@Request() req){
+        console.log(req.user)
         return this.adminService.findAllProducts();
     }
 

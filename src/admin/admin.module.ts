@@ -13,7 +13,8 @@ import { AuthModule } from "src/auth/auth.module";
 @Module({
     imports:[
         TypeOrmModule.forFeature([Customer,Product, Category, Order,Admin])
-        ,AuthModule],
+        ,AuthModule,
+    ],
     controllers:[AdminController],
     providers:[AdminService]
 })

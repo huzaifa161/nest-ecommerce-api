@@ -13,6 +13,8 @@ export class CustomerService{
     async findOne(email){
         return await this.customerRepository.findOne({email});
     }
+
+
     async findToken(token){
         const result = await this.customerRepository.findOne({resetToken: token});
         console.log(result)
@@ -21,9 +23,13 @@ export class CustomerService{
     }
 
 
-    async createNewCustomer(customer){
-        const customerInstance = this.customerRepository.create(customer);
-        return await this.customerRepository.save(customerInstance);
+    async createNewCustomer({ name, email, password}){
+        const cus = new Customer();
+        cus.name = name;
+        cus.email = email;
+        cus.password = password; 
+        const customerRes =  await this.customerRepository.save(cus);
+        return customerRes;
     }
     async save(user){
         await this.customerRepository.save(user);
