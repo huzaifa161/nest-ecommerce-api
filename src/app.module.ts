@@ -10,15 +10,18 @@ import { OrderModule } from './order/order.module';
 import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { MailModule } from './mail/mail.module';
+import { ProductModule } from './product/product.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
+  imports: [
+    TypeOrmModule.forRoot({
     type: "mssql",
     host: "localhost",
     port: 1433,
     username: "huzaifa",
     password: "huzaifa",
-    database: "test",
+    database: "test1",
     entities: [join(__dirname, '**', '*.entity.{ts,js}')],
     synchronize: true
   }),
@@ -27,7 +30,9 @@ import { MailModule } from './mail/mail.module';
   OrderModule,
   AuthModule,
   CartModule,
-  AuthModule,MailModule],
+  AuthModule,
+  MailModule,
+ProductModule],
   controllers: [AppController],
   providers: [AppService],
 })

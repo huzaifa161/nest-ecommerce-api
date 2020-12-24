@@ -18,6 +18,8 @@ export class Category {
   // @Column({ nullable: true})
   // category_parent_id: number;
   
+  @Column({ nullable: true })
+    parentId: number;
   @OneToMany(() => Product, product => product.category)
   products:Product[];
 

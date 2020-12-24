@@ -21,13 +21,17 @@ export class OrderService{
     }
 
     async createOrder(customerId){
+        console.log('create order')
         const cartItems = await this.cartService.getCartItems(customerId);
+
         if(!cartItems) return;
 
         const order = this.orderRepository.create({
             order_date:Date.now().toString(),
             order_status:'pending',
             customer:customerId,
+            total_amount: cartItems.total,
+            product_count: cartItems.quantity
         });
 
         const savedOrder = await this.orderRepository.save(order)

@@ -40,6 +40,6 @@ export class CartController{
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
     clearCart(@Param('id') cartId){
-        return this.cartService.clearCart(cartId);
+        return this.cartService.clearCartItem(cartId)
     }
 }

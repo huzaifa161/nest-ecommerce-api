@@ -14,10 +14,10 @@ export class AdminController{
     }
 
 
-    // @Post('/create-admin')
-    // async createAdmin(@Body() loginData){
-    //     return await this.adminService.createAdmin(loginData.name,loginData.email, loginData.password);
-    // }
+    @Post('/create-admin')
+    async createAdmin(@Body() loginData){
+        return await this.adminService.createAdmin(loginData.name,loginData.email, loginData.password);
+    }
 
 
     @Post('/login')
@@ -42,9 +42,9 @@ export class AdminController{
       }))
     async createProduct(@Body() productData: ProductDto, @UploadedFiles() files,@Request() req){
         productData.admin = req.user.sub;
-        if(files.image_1) productData.image_1 = files.image_1[0].path;
-        if(files.image_2) productData.image_2 = files.image_2[0].path;
-        if(files.image_3) productData.image_3 = files.image_3[0].path;
+        if(files.image_1) productData.image_1 = files.image_1[0].filename;
+        if(files.image_2) productData.image_2 = files.image_2[0].filename;
+        if(files.image_3) productData.image_3 = files.image_3[0].filename;
         return await this.adminService.createNewProduct(productData);
     }
 
@@ -61,7 +61,7 @@ export class AdminController{
           })
     }))
     async createCategory(@Body() categoryData,@UploadedFile() file){
-        categoryData.image = file.path;
+        categoryData.image = file.filename;
         return this.adminService.createNewCategory(categoryData);
     }
 

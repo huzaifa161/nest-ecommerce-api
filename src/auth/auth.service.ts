@@ -24,6 +24,7 @@ export class AuthService{
         savedUser.resetToken = token;
         savedUser.tokenExpires = tokenExpires;
         await this.customerService.save(savedUser);
+        console.log(token)
 
         const link = "http://" + host + "/api/auth/confirm-email/" + token;
 
@@ -118,8 +119,12 @@ export class AuthService{
         return null;
     }
     async login(user: any) {
+        console.log(user)
         const payload = { email: user.email, sub: user.id };
         return {
+            email:user.email,
+            id:user.id,
+            tokenExpirationDate:new Date(Date.now() + 60000000),
           access_token: this.jwtService.sign(payload)
         };
     }

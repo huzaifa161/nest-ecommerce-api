@@ -12,7 +12,7 @@ export class Cart {
   total: number;
 
   @Column({ nullable: true})
-  quantity: string;
+  quantity: number;
 
   @OneToMany(() => ProductToCart, productToCart => productToCart.cart)
   public productToCart!: ProductToCart[];
