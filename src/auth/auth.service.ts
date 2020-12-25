@@ -1,3 +1,4 @@
+
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
@@ -18,8 +19,8 @@ export class AuthService{
         }
         const savedUser = await this.customerService.createNewCustomer({ name,email,password:await this.getHashedPassword(password)});  
         const token = crypto.randomBytes(20).toString('hex');
-
-        const tokenExpires = (Date.now() * 3600000000).toString();
+        
+        const tokenExpires = (Date.now() + 3600000000).toString();
 
         savedUser.resetToken = token;
         savedUser.tokenExpires = tokenExpires;
@@ -35,7 +36,7 @@ export class AuthService{
         </div>
     `
         
-        await this.mailService.sendMail(email,html);
+        // await this.mailService.sendMail(email,html);
         return { message:"Account created Please verify your account"}
     }
 
@@ -54,13 +55,14 @@ export class AuthService{
     async createForgetPasswordToken(email, host){
         if(!email) return { error:'Email is required'};
         const customer = await this.customerService.findOne(email);
-        if(!customer || !customer.verified) throw new NotFoundException('customer with that email does not exists or not verified');
+        if(!customer || !customer.verified) throw new NotFoundException('EMAIL_NOT_EXISTS');
 
         const token = crypto.randomBytes(20).toString('hex');
 
         customer.resetToken = token;
         customer.tokenExpires = (Date.now() + 3600000).toString();
         await this.customerService.save(customer);
+        console.log(token);
 
         const link = "http://" + host + "/api/auth/reset/" + token;
         const html = `
@@ -70,7 +72,7 @@ export class AuthService{
                 If you did not request this, please ignore this email and your password will remain unchanged.\n
             </div>
         `
-        await this.mailService.sendMail(email,html);
+        // await this.mailService.sendMail(email,html);
 
 
         return {message:`Email sent to ${email}..`}
@@ -80,10 +82,10 @@ export class AuthService{
     
     async findUserByToken(token){
         const userExists = await this.customerService.findToken(token);
-        if(!userExists) throw new NotFoundException('Invalid token');
+        if(!userExists) throw new NotFoundException('INVALID_TOKEN');
 
         const tokenExpires = Number(userExists.tokenExpires);
-        if(tokenExpires < Date.now()) throw new NotFoundException('Link Expired');
+        if(tokenExpires < Date.now()) throw new NotFoundException('LINK_EXPIRED');
 
         return userExists;
     }
@@ -95,6 +97,9 @@ export class AuthService{
 
     async resetPassword(token,password,confirmPassword){
         if(!password) return { error:'Password is required'};
+        if(!confirmPassword) return { error:'Confirm Password is required'};
+
+        if(password !== confirmPassword) return { error:'Password does not match'};
         const user = await this.findUserByToken(token);
         user.password = await this.getHashedPassword(password);
         user.resetToken = null;
@@ -125,7 +130,7 @@ export class AuthService{
             email:user.email,
             id:user.id,
             tokenExpirationDate:new Date(Date.now() + 60000000),
-          access_token: this.jwtService.sign(payload)
+            token: this.jwtService.sign(payload)
         };
     }
 
