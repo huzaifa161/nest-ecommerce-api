@@ -13,10 +13,16 @@ export class OrderService{
     ){
     }
     findOrder(orderId):Promise<Order>{
-        return this.orderRepository.findOne(orderId);
+        console.log(orderId)
+        return this.orderRepository.createQueryBuilder('order')
+        .leftJoinAndSelect('order.productToOrder','orderDetails')
+        .leftJoinAndSelect('orderDetails.product','product')
+        .where('order.id=:id',{id:orderId})
+        .getOne()
     }
 
     findOrders(customerId):Promise<Order[]>{
+        console.log(customerId)
         return this.orderRepository.find({customer:customerId});
     }
 

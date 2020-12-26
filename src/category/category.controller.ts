@@ -12,6 +12,11 @@ export class CategoryController{
     getCategories(){
         return this.categoryService.getCategories();
     }
+
+    @Get('sub')
+    getCategoriesAndSub(){
+        return this.categoryService.getCategoriesAndSub();
+    }
     @Get('products')
     getCategoriesAndProducts(){
         return this.categoryService.getCategoriesAndProducts();

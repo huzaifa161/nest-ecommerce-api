@@ -28,15 +28,21 @@ export class CategoryService{
     }
 
 
-    async getCategories(){
+    async getCategoriesAndSub(){
         return await this.categoryRepository.find({
             join:{
                 alias:'cat',
                 leftJoinAndSelect:{
                     subCat:'cat.children'
                 }
-            },
+            },where:{
+                parentId:null
+            }
         });
+    }
+
+    async getCategories(){
+        return await this.categoryRepository.find();
     }
 
     async getCategoriesAndProducts(){

@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Category } from './category.entity';
 import { Product } from './product.entity';
 
 @Entity()
@@ -18,5 +19,7 @@ export class Admin {
 
   @OneToMany(() => Product, product => product.admin)
   products:Product[];
+  @OneToMany(() => Category, category => category.admin)
+  categories:Category[];
 
 }

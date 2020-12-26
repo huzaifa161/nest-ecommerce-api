@@ -29,6 +29,8 @@ export class Product {
 
   @Column({ nullable: true})
   image_3:string;
+  @Column()
+  adminId:number;
   
   @ManyToOne(() => Admin, admin => admin.products)
   admin:Admin;

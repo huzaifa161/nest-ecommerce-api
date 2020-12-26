@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany,ManyToOne } from 'typeorm';
+import { Admin } from './admin.entity';
 import { Product } from './product.entity';
 @Entity()
 export class Category {
@@ -7,19 +8,20 @@ export class Category {
   id: number;
 
   @Column()
-  category_name: string;
+  categoryName: string;
 
   @Column()
-  category_desc: string;
+  categoryDesc: string;
 
   @Column()
   image: string;
 
-  // @Column({ nullable: true})
-  // category_parent_id: number;
+
+  @Column()
+  adminId:number;
   
   @Column({ nullable: true })
-    parentId: number;
+  parentId: number;
   @OneToMany(() => Product, product => product.category)
   products:Product[];
 
@@ -28,5 +30,8 @@ export class Category {
 
   @OneToMany(() => Category, category => category.parent)
   children: Category[];
+
+  @ManyToOne(() => Admin, admin => admin.products)
+  admin:Admin;
 
 }

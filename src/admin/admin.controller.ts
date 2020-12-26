@@ -41,10 +41,10 @@ export class AdminController{
         })
       }))
     async createProduct(@Body() productData: ProductDto, @UploadedFiles() files,@Request() req){
-        productData.admin = req.user.sub;
         if(files.image_1) productData.image_1 = files.image_1[0].filename;
         if(files.image_2) productData.image_2 = files.image_2[0].filename;
         if(files.image_3) productData.image_3 = files.image_3[0].filename;
+        productData.adminId = req.user.sub;
         return await this.adminService.createNewProduct(productData);
     }
 
@@ -53,15 +53,17 @@ export class AdminController{
     @Post('/add-new-category')
     @UseInterceptors(FileInterceptor('image',{
         storage:diskStorage({
-            destination: './uploads/category'
+            destination: './uploads'
             , filename: (req, file, cb) => {
               const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
               cb(null, `${randomName}${path.extname(file.originalname)}`)
             }
           })
     }))
-    async createCategory(@Body() categoryData,@UploadedFile() file){
+    async createCategory(@Body() categoryData,@UploadedFile() file,@Request() req){
         categoryData.image = file.filename;
+        categoryData.adminId = req.user.sub;
+        categoryData.parentId = categoryData.parentId === 'null' ? null: categoryData.parentId;
         return this.adminService.createNewCategory(categoryData);
     }
 

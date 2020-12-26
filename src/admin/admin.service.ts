@@ -46,7 +46,9 @@ export class AdminService{
     }
 
     createNewCategory(categoryData){
+        console.log(categoryData)
         const category =  this.categoryRespository.create(categoryData);
+
         return this.categoryRespository.save(category);
         
     }
