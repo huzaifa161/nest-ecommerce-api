@@ -17,11 +17,13 @@ export class CustomerService{
 
     async findToken(token){
         const result = await this.customerRepository.findOne({resetToken: token});
-        console.log(result)
         return result
 
     }
 
+    async findCustomerByToken(email){
+        return await this.customerRepository.findOne({ email});
+    }
 
     async createNewCustomer({ name, email, password}){
         const cus = new Customer();

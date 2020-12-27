@@ -23,14 +23,11 @@ export class AdminService{
 
     }
 
-    findAdmin(){
-        
-    }
 
     async loginAdmin(email:string, password:string){
         const admin = await this.adminRepository.findOne({ email});
         if(admin && await bcrypt.compare(password,admin.password)){
-            return this.authService.login(admin);
+            return this.authService.login(admin,'Admin');
         }
         return null;
     }

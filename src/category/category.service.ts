@@ -14,17 +14,35 @@ export class CategoryService{
         ){
     }
     getProductsByCategory(catId){
-        return this.productRepository.find({
-            join:{
-                alias:'cat',
-                innerJoinAndSelect:{
-                    subCat:"cat.category_parent_id"
-                }
-            },
-            where:{
-                category:catId
-            }
-        })
+        // return this.categoryRepository.createQueryBuilder('category')
+        // .leftJoinAndSelect('category.children','children')
+        // .where('category.id = :id',{id:catId})
+        // .getMany()
+
+
+        
+        // return this.categoryRepository.find({
+        //     join:{
+        //         alias:'cat',
+        //         innerJoinAndSelect:{
+        //             subCat:'cat.children'
+        //         }
+        //     },where:{
+        //         id:catId
+        //     }
+        // })
+
+        // return this.productRepository.find({
+        //     join:{
+        //         alias:'cat',
+        //         innerJoinAndSelect:{
+        //             subCat:"cat.category_parent_id"
+        //         }
+        //     },
+        //     where:{
+        //         category:catId
+        //     }
+        // })
     }
 
 

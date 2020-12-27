@@ -1,8 +1,9 @@
 
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import { throwError } from 'rxjs';
 import { CustomerService } from "src/customer/customer.service";
 import { MailService } from "src/mail/mail.service";
 @Injectable()
@@ -17,6 +18,11 @@ export class AuthService{
         if(!name || !email || !password){
             return { message:'Invalid data' }
         }
+
+        if(await this.customerService.findCustomerByToken(email)){
+            throw new InternalServerErrorException('EMAIL_EXISTS');
+        }
+
         const savedUser = await this.customerService.createNewCustomer({ name,email,password:await this.getHashedPassword(password)});  
         const token = crypto.randomBytes(20).toString('hex');
         
@@ -62,7 +68,6 @@ export class AuthService{
         customer.resetToken = token;
         customer.tokenExpires = (Date.now() + 3600000).toString();
         await this.customerService.save(customer);
-        console.log(token);
 
         const link = "http://" + host + "/api/auth/reset/" + token;
         const html = `
@@ -117,20 +122,22 @@ export class AuthService{
 
     async validateCustomer(email: string, password:string){
         const user = await this.customerService.findOne(email);
+        console.log(user)
+        console.log(email, password)
         if(user && await bcrypt.compare(password, user.password) && user.verified){
             const { password, ...result} = user;
             return result;
         }
         return null;
     }
-    async login(user: any) {
-        console.log(user)
+    async login(user: any, role = 'Customer') {
         const payload = { email: user.email, sub: user.id };
         return {
             email:user.email,
             id:user.id,
             tokenExpirationDate:new Date(Date.now() + 60000000),
-            token: this.jwtService.sign(payload)
+            token: this.jwtService.sign(payload),
+            role
         };
     }
 
