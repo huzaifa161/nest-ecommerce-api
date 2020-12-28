@@ -24,6 +24,7 @@ export class CategoryController{
 
     @Get(':catId')
     getProductsByCategory(@Param('catId') catId){
+        console.log('catId', catId)
         return this.categoryService.getProductsByCategory(catId)
     }
     

@@ -22,7 +22,9 @@ export class AdminModule{
     configure(consumer: MiddlewareConsumer) {
         consumer
           .apply(AuthMiddleware)
-          .exclude({ path:'api/admin/login', method: RequestMethod.POST})
+          .exclude({ path:'api/admin/login', method: RequestMethod.POST},{
+            path:'api/admin/create-admin', method: RequestMethod.POST
+          })
           .forRoutes('api/admin/*');
       }
 }

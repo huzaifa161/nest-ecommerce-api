@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Patch, UseInterceptors, UploadedFile, UploadedFiles, Request } from "@nestjs/common";
+import { Controller, Get, Post, Body, Param, Patch, UseInterceptors, UploadedFile, UploadedFiles, Request, Put } from "@nestjs/common";
 import { FileFieldsInterceptor, FileInterceptor } from "@nestjs/platform-express";
 import { ProductDto } from "src/product/product.dto";
 import { AdminService } from './admin.service';
@@ -60,11 +60,11 @@ export class AdminController{
             }
           })
     }))
-    async createCategory(@Body() categoryData,@UploadedFile() file,@Request() req){
+    async createCategory(@Body() categoryData,@UploadedFile() file,@Request() req,){
         categoryData.image = file.filename;
         categoryData.adminId = req.user.sub;
         categoryData.parentId = categoryData.parentId === 'null' ? null: categoryData.parentId;
-        return this.adminService.createNewCategory(categoryData);
+        return this.adminService.createNewCategory(categoryData, categoryData.parentId);
     }
 
 
@@ -98,9 +98,9 @@ export class AdminController{
 
 
     //UPDATE ORDER STATUS
-    @Patch('/orders/update-order-status/:id')
-    updateOrderStatus(@Param('id') id:string){
-        return id;
+    @Put('/orders/update-order-status/:id')
+    updateOrderStatus(@Param('id') id:string, @Body() body){
+        return this.adminService.updateOrderStatus(id,body.status);
     }
 
 

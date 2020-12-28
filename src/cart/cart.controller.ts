@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards,Request } from "@nestjs/common";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { CartService } from "./cart.service";
 
@@ -18,18 +18,23 @@ export class CartController{
         return this.cartService.addItemToCart(data);
     }
 
+    // @UseGuards(JwtAuthGuard)
+    // @Patch('increment/:cartId/:productId')
+    // incrementCartItem(@Param('cartId') cartId,@Param('productId') productId){
+    //     return this.cartService.incrementCartItem(cartId, productId);
+    // }
+
     @UseGuards(JwtAuthGuard)
-    @Patch('increment/:cartId/:productId')
-    incrementCartItem(@Param('cartId') cartId,@Param('productId') productId){
-        return this.cartService.incrementCartItem(cartId, productId);
+    @Patch('/update-cart/:prodToCartId')
+    async updateCartItemCount(@Param('prodToCartId') id, @Body() body){
+        return this.cartService.updateCartItem(id,body.quantity)
     }
 
-
-    @UseGuards(JwtAuthGuard)
-    @Patch('decrement/:cartId/:productId')
-    decrementCartItem(@Param('cartId') cartId, @Param('productId') productId){
-        return this.cartService.decrementCartItem(cartId, productId);
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Patch('decrement/:cartId/:productId')
+    // decrementCartItem(@Param('cartId') cartId, @Param('productId') productId){
+    //     return this.cartService.decrementCartItem(cartId, productId);
+    // }
 
     @UseGuards(JwtAuthGuard)
     @Get(':customerId')

@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import {  Repository } from 'typeorm';
+import {  Repository, TreeRepository } from 'typeorm';
 import { Customer } from '../entities/customer.entity';
 import { Order } from '../entities/order.entity';
 import { Product } from '../entities/product.entity';
@@ -16,7 +16,7 @@ export class AdminService{
         @InjectRepository(Customer) private customerRespository:Repository<Customer>,
         @InjectRepository(Product) private productRespository:Repository<Product>,
         @InjectRepository(Order) private orderRespository:Repository<Order>,
-        @InjectRepository(Category) private categoryRespository:Repository<Category>,
+        @InjectRepository(Category) private categoryRespository:TreeRepository<Category>,
         @InjectRepository(Admin) private adminRepository:Repository<Admin>,
         private authService:AuthService
     ){
@@ -42,9 +42,25 @@ export class AdminService{
         return await bcrypt.hash(password,10);
     }
 
-    createNewCategory(categoryData){
-        console.log(categoryData)
-        const category =  this.categoryRespository.create(categoryData);
+    async updateOrderStatus(orderId, status){
+        const order = await this.orderRespository.findOne({id:orderId});
+        order.order_status = status;
+        await this.orderRespository.save(order);
+    }
+    async createNewCategory(categoryData,parentId){
+        const parent = await this.categoryRespository.findOne({ id: parentId});
+
+
+        const category =  new Category();
+        category.categoryName = categoryData.categoryName;
+        category.categoryDesc = categoryData.categoryDesc;
+        category.parentId = parentId;
+        category.image = categoryData.image;
+        category.adminId = categoryData.adminId;
+        category.parentId = categoryData.parentId === 'null' ? null: categoryData.parentId;
+
+        category.parent = parent;
+
 
         return this.categoryRespository.save(category);
         

@@ -65,35 +65,62 @@ export class CartService{
     //     })
     // }
 
-    async incrementCartItem(cartId, productId){
-        const data = await this.productToCartRepository.findOne({cartId, productId});
-        data.quantity = data.quantity +1;
-        data.total = data.price * data.quantity;
 
-        const cart = await this.cartRepository.findOne({id:cartId});
-        cart.quantity = cart.quantity + 1;
-        cart.total = cart.total + data.total;
-        await this.cartRepository.save(cart);
-        return this.productToCartRepository.save(data);
+    async updateCartItem(productToCartId, quantity){
+            let total;
+            const cartItem = await this.productToCartRepository.findOne({productToCartId});
+            const cart = await this.cartRepository.findOne({ id:cartItem.cartId});
+
+            if(+quantity === 0){
+                await this.productToCartRepository.delete(cartItem.productToCartId);
+                cart.total = cart.total - cartItem.total;
+                cart.quantity = cart.quantity - 1; 
+                return await this.cartRepository.save(cart);    
+            }
+            const newPrice = (quantity * cartItem.price) - cartItem.total;
+
+            cartItem.quantity = quantity;
+            cartItem.total = cartItem.price * quantity;
+
+            await this.productToCartRepository.save(cartItem)
+
+            cart.total = cart.total + newPrice;
+
+            await this.cartRepository.save(cart);
+
+            return { message:'Cart Updated'}
+
     }
 
+    // async incrementCartItem(cartId, productId){
+    //     const data = await this.productToCartRepository.findOne({cartId, productId});
+    //     data.quantity = data.quantity +1;
+    //     data.total = data.price * data.quantity;
+
+    //     const cart = await this.cartRepository.findOne({id:cartId});
+    //     cart.quantity = cart.quantity + 1;
+    //     cart.total = cart.total + data.total;
+    //     await this.cartRepository.save(cart);
+    //     return this.productToCartRepository.save(data);
+    // }
 
 
-    async decrementCartItem(cartId, productId){
-        const data = await this.productToCartRepository.findOne({cartId, productId});
-        if(data.quantity > 1){
-            data.quantity = data.quantity - 1;
-            data.total = data.price * data.quantity; 
 
-            const cart = await this.cartRepository.findOne({id:cartId});
-            cart.total = cart.total - data.quantity;
-            cart.quantity = data.quantity === 1 ? cart.quantity - 1 : cart.quantity;
+    // async decrementCartItem(cartId, productId){
+    //     const data = await this.productToCartRepository.findOne({cartId, productId});
+    //     if(data.quantity > 1){
+    //         data.quantity = data.quantity - 1;
+    //         data.total = data.price * data.quantity; 
 
-            await this.cartRepository.save(cart)
+    //         const cart = await this.cartRepository.findOne({id:cartId});
+    //         cart.total = cart.total - data.quantity;
+    //         cart.quantity = data.quantity === 1 ? cart.quantity - 1 : cart.quantity;
 
-        }
-        return this.productToCartRepository.save(data);
-    }
+    //         await this.cartRepository.save(cart)
+
+    //     }
+    //     return this.productToCartRepository.save(data);
+    // }
 
 
     async clearCartItem(id){

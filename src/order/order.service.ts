@@ -58,6 +58,11 @@ export class OrderService{
     }
 
 
-    
+    async updateOrderStatus(orderId, status){
+        const order = await this.orderRepository.findOne({id:orderId});
+        order.order_status = status;
+        return await this.orderRepository.save(order);
+
+    }
 
 }
