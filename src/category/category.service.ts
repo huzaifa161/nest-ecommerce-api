@@ -27,7 +27,6 @@ export class CategoryService{
     }
     
     async getProductsByCategory(catId){
-        console.log(catId)
         const parent = await this.categoryRepository.findOne(catId);
         const trees = await this.categoryRepository.findDescendantsTree(parent);
         const catIds = this.filterCategories(trees.children);
@@ -92,11 +91,17 @@ export class CategoryService{
     }
 
     async getCategoriesAndProducts(){
-        const categories = await this.categoryRepository.createQueryBuilder('cat')
-        .leftJoinAndSelect('cat.products','products')
-        .getMany()
-        return categories.filter(cat => cat.products.length >=5)
+        const categories:Category[] = await this.categoryRepository.createQueryBuilder('cat')
+        .where({ parentId:null})
+        .limit(10)
+        .getMany();
 
+
+        for(let cat of categories){
+            const products  = await this.getProductsByCategory(cat.id);
+            cat.products = products;
+        }
+        return categories.filter(cat => cat.products.length >= 5);
     }
     
 }
