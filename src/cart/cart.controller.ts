@@ -14,7 +14,8 @@ export class CartController{
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    addItemToCart(@Body() data){
+    addItemToCart(@Body() data, @Request() req){
+        data.customerId = req.user.userId;
         return this.cartService.addItemToCart(data);
     }
 
@@ -37,9 +38,10 @@ export class CartController{
     // }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':customerId')
-    getCartItems(@Param('customerId') customerId:string){
-        return this.cartService.getCartItems(customerId);
+    @Get()
+    getCartItems(@Request() req){
+        console.log(req.user)
+        return this.cartService.getCartItems(req.user.userId);
     }
 
     @UseGuards(JwtAuthGuard)

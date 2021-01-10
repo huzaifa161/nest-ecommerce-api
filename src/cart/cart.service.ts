@@ -15,7 +15,7 @@ export class CartService{
 
     }    
     async addItemToCart(data){
-        console.log('add item')
+        console.log(data)
         let cartExists = await this.cartRepository.findOne({ customer: data.customerId});
         if(!cartExists){
             const cart = this.cartRepository.create({customer:data.customerId});
@@ -45,6 +45,7 @@ export class CartService{
 
 
     getCartItems(customerId){
+        console.log(customerId)
         return this.cartRepository.createQueryBuilder('cart')
         .leftJoinAndSelect('cart.productToCart','productToCart')
         .leftJoinAndSelect('productToCart.product','product')
@@ -86,6 +87,7 @@ export class CartService{
 
             cart.total = cart.total + newPrice;
 
+            console.log(cart)
             await this.cartRepository.save(cart);
 
             return { message:'Cart Updated'}
