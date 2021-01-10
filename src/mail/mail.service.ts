@@ -8,7 +8,7 @@ export class MailService {
   async sendMail(to:string, html:string){
     try{
         await this.client.send({
-            from:'huzaifajameel2@gmail.com',
+            from:process.env.EMAIL,
             to,
             subject:'NoReply',
             html 

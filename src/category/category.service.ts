@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Category } from "src/entities/category.entity";
 import { Product } from "src/entities/product.entity";
-import { getManager, In, Repository, TreeRepository } from "typeorm";
+import { Connection, getManager, In, Repository, TreeRepository } from "typeorm";
 
 @Injectable()
 export class CategoryService{
@@ -10,7 +10,8 @@ export class CategoryService{
 
     constructor(
         @InjectRepository(Category) private categoryRepository:TreeRepository<Category>,
-        @InjectRepository(Product) private productRepository:Repository<Product>
+        @InjectRepository(Product) private productRepository:Repository<Product>,
+        private connection:Connection
         ){
     }
 
@@ -87,7 +88,30 @@ export class CategoryService{
         });
     }
 
+
     async getCategories(){
+
+
+        // return await this.categoryRepository.createQueryBuilder('cat')
+            // .leftJoinAndSelect('cat.products','products')
+            // // .loadRelationCountAndMap('cat.products','cat.products')
+            // // .select(['cat.id','products'])
+            // .printSql()
+            // .getMany()
+        // return await this.connection.query(`SELECT DISTINCT c.id,c.categoryName,p.productName,(p.productName) as productCount FROM category c 
+        // INNER JOIN product p ON p.categoryId = c.id
+        // GROUP BY c.id,c.categoryName,p.productName`)
+        return this.categoryRepository.createQueryBuilder('category')
+        .innerJoinAndSelect('category.products','products')
+        .select(['category.id','category.categoryName','products.productName','COUNT(products.productName) as prod'])
+        .distinct()
+        .groupBy('category.categoryName')
+        .addGroupBy('category.id')
+        .addGroupBy('products.id')
+        .addGroupBy('products.productName')
+        .orderBy('category.id')
+        .getMany();
+
         return await this.categoryRepository.find();
     }
 

@@ -12,18 +12,23 @@ import { CartModule } from './cart/cart.module';
 import { MailModule } from './mail/mail.module';
 import { ProductModule } from './product/product.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal:true
+    }),
     TypeOrmModule.forRoot({
       type: 'mssql',
       host: 'localhost',
       port: 1433,
-      username: 'huzaifa',
+      username: process.env.DB_USERNAME,
       password: 'huzaifa',
       database: 'test',
       entities: [join(__dirname, '**', '*.entity.{ts,js}')],
       synchronize: true,
+      logging:true
     }),
     AdminModule,
     CategoryModule,
@@ -33,6 +38,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     AuthModule,
     MailModule,
     ProductModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
